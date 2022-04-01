@@ -71,7 +71,6 @@ export class SSBSource {
   public mentionsFeed$: Stream<GetReadable<MsgAndExtras>>;
   public mentionsFeedLive$: Stream<MsgId>;
   public firewallAttempt$: Stream<GetReadable<FirewallAttempt>>;
-  public firewallAttemptLive$: Stream<FirewallAttempt>;
   public selfPublicRoots$: Stream<ThreadSummaryWithExtras>;
   public selfPrivateRootIdsLive$: Stream<MsgId>;
   public selfRepliesLive$: Stream<MsgAndExtras<PostContent>>;
@@ -127,10 +126,6 @@ export class SSBSource {
 
     this.firewallAttempt$ = this.ssb$.map(
       (ssb) => () => ssb.connFirewall.attempts({old: true, live: false}),
-    );
-
-    this.firewallAttemptLive$ = this.fromPullStream<FirewallAttempt>((ssb) =>
-      ssb.connFirewall.attempts({old: false, live: true}),
     );
 
     this.selfPublicRoots$ = this.fromPullStream<ThreadSummaryWithExtras>(

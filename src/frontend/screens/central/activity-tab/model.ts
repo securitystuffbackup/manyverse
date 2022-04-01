@@ -56,9 +56,7 @@ export default function model(ssbSource: SSBSource, actions: Actions) {
     );
 
   const incUpdatesReducer$ = initialWait$
-    .map(() =>
-      xs.merge(ssbSource.mentionsFeedLive$, ssbSource.firewallAttemptLive$),
-    )
+    .map(() => ssbSource.mentionsFeedLive$)
     .flatten()
     .mapTo(function incUpdatesReducer(prev: State): State {
       return {...prev, numOfUpdates: prev.numOfUpdates + 1};
