@@ -206,11 +206,11 @@ android {
                 keyAlias System.getenv("BITRISEIO_ANDROID_KEYSTORE_ALIAS")
                 keyPassword System.getenv("BITRISEIO_ANDROID_KEYSTORE_PRIVATE_KEY_PASSWORD")
             } else {
+                // This generally shouldn't happen, but fall back to using the debug keystore
                 storeFile file('debug.keystore')
                 storePassword 'android'
                 keyAlias 'androiddebugkey'
                 keyPassword 'android'
-                // throw new Exception('Refusing to make release build with wrong keystore')
             }
         }
     }
@@ -245,8 +245,8 @@ android {
             } else if (System.getenv("BITRISEIO_ANDROID_KEYSTORE_PASSWORD") != null) {
                 signingConfig signingConfigs.release
             } else {
+                // This generally shouldn't happen, but fall back to using the debug keystore
                 signingConfig signingConfigs.debug
-                // throw new Exception('Refusing to make release build with wrong keystore')
             }
         }
     }
