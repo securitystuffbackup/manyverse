@@ -11,6 +11,16 @@ import {GetReadable, SSBSource} from '~frontend/drivers/ssb';
 import {MsgAndExtras, ThreadSummaryWithExtras} from '~frontend/ssb/types';
 import {Props} from './props';
 
+type SearchResults =
+  | {
+      type: 'feed';
+      getReadable: GetReadable<ThreadSummaryWithExtras>;
+    }
+  | {
+      type: 'posts';
+      getReadable: GetReadable<MsgAndExtras<PostContent>>;
+    };
+
 export interface State {
   selfFeedId: FeedId;
   selfAvatarUrl?: string;
@@ -20,8 +30,7 @@ export interface State {
   queryOverride: string;
   queryOverrideFlag: number;
   queryInProgress: boolean;
-  getResultsReadable: GetReadable<MsgAndExtras<PostContent>> | null;
-  getFeedReadable: GetReadable<ThreadSummaryWithExtras> | null;
+  searchResults: SearchResults | null;
 }
 
 export interface Actions {
@@ -48,8 +57,7 @@ export default function model(
           queryOverride: props.query ?? '',
           queryOverrideFlag: 0,
           queryInProgress: !!props.query,
-          getResultsReadable: null,
-          getFeedReadable: null,
+          searchResults: null,
         };
       },
   );
@@ -69,7 +77,7 @@ export default function model(
         } else if (query.length > 1 && query.startsWith('#')) {
           return {...prev, queryInProgress: true};
         } else {
-          return {...prev, queryInProgress: false, getResultsReadable: null};
+          return {...prev, queryInProgress: false, searchResults: null};
         }
       },
   );
@@ -90,8 +98,7 @@ export default function model(
             queryOverride: '',
             queryOverrideFlag: 1 - prev.queryOverrideFlag,
             queryInProgress: false,
-            getResultsReadable: null,
-            getFeedReadable: null,
+            searchResults: null,
           };
         } else {
           return {...prev, query};
@@ -122,7 +129,10 @@ export default function model(
     .map(
       (getResultsReadable) =>
         function updateResultsReducer(prev: State): State {
-          return {...prev, getResultsReadable, getFeedReadable: null};
+          return {
+            ...prev,
+            searchResults: {type: 'posts', getReadable: getResultsReadable},
+          };
         },
     );
 
@@ -133,7 +143,10 @@ export default function model(
     .map(
       (getFeedReadable) =>
         function updateResultsReducer(prev: State): State {
-          return {...prev, getResultsReadable: null, getFeedReadable};
+          return {
+            ...prev,
+            searchResults: {type: 'feed', getReadable: getFeedReadable},
+          };
         },
     );
 

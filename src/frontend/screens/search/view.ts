@@ -181,6 +181,47 @@ class Results extends PureComponent<{
   }
 }
 
+const SearchResults: React.FC<State> = (state) => {
+  const {queryInProgress, searchResults} = state;
+  if (!queryInProgress || !searchResults) {
+    return null;
+  }
+
+  switch (searchResults.type) {
+    case 'feed':
+      return h(Feed, {
+        sel: 'feed',
+        getReadable: searchResults.getReadable,
+        prePublication$: null,
+        postPublication$: null,
+        selfFeedId: state.selfFeedId,
+        lastSessionTimestamp: state.lastSessionTimestamp,
+        preferredReactions: state.preferredReactions,
+        style: styles.feed,
+        EmptyComponent:
+          state.query.length > 0
+            ? h(EmptySection, {
+                style: styles.emptySection,
+                title: t('search.empty.zero_results.title'),
+                description: t('search.empty.zero_results.description', {
+                  query: state.query,
+                }),
+              })
+            : (null as any),
+      });
+
+    case 'posts':
+      return h(Results, {
+        sel: 'results',
+        query: state.query,
+        getScrollStream: searchResults.getReadable,
+      });
+
+    default:
+      return h(PlaceholderResult);
+  }
+};
+
 export default function view(state$: Stream<State>) {
   const setInputNativeProps$ = state$
     .compose(
@@ -197,8 +238,7 @@ export default function view(state$: Stream<State>) {
         'queryInProgress',
         'query',
         'preferredReactions',
-        'getResultsReadable',
-        'getFeedReadable',
+        'searchResults',
       ]),
     )
     .map((state) => {
@@ -229,39 +269,7 @@ export default function view(state$: Stream<State>) {
             : null,
         ]),
 
-        h(View, {style: styles.container}, [
-          state.queryInProgress && state.getFeedReadable
-            ? h(Feed, {
-                sel: 'feed',
-                getReadable: state.getFeedReadable,
-                prePublication$: null,
-                postPublication$: null,
-                selfFeedId: state.selfFeedId,
-                lastSessionTimestamp: state.lastSessionTimestamp,
-                preferredReactions: state.preferredReactions,
-                style: styles.feed,
-                EmptyComponent:
-                  state.query.length > 0
-                    ? h(EmptySection, {
-                        style: styles.emptySection,
-                        title: t('search.empty.zero_results.title'),
-                        description: t(
-                          'search.empty.zero_results.description',
-                          {query: state.query},
-                        ),
-                      })
-                    : (null as any),
-              })
-            : state.queryInProgress && state.getResultsReadable
-            ? h(Results, {
-                sel: 'results',
-                query: state.query,
-                getScrollStream: state.getResultsReadable,
-              })
-            : state.queryInProgress
-            ? h(PlaceholderResult)
-            : null,
-        ]),
+        h(View, {style: styles.container}, [h(SearchResults, state)]),
       ]);
     });
 }
