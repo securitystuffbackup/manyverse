@@ -32,6 +32,7 @@ import {MsgAndExtras} from '~frontend/ssb/types';
 import {displayName} from '~frontend/ssb/utils/from-ssb';
 import {State} from './model';
 import {styles} from './styles';
+import AccountsList from '~frontend/components/AccountsList';
 
 const Touchable = Platform.select<any>({
   android: TouchableNativeFeedback,
@@ -216,6 +217,9 @@ const SearchResults: React.FC<State> = (state) => {
         query: state.query,
         getScrollStream: searchResults.getReadable,
       });
+
+    case 'AccountResults':
+      return h(AccountsList, {accounts: searchResults.users});
 
     default:
       return h(PlaceholderResult);
