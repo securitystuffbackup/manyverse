@@ -474,6 +474,7 @@ export class SSBSource {
     detailedLogs?: boolean;
     showFollows?: boolean;
     allowCheckingNewVersion?: boolean;
+    enableFirewall?: boolean;
   }> {
     return this.fromCallback<any>((ssb, cb) => ssb.settingsUtils.read(cb));
   }
@@ -609,6 +610,11 @@ export interface SettingsAllowCheckingNewVersionReq {
   allowCheckingNewVersion: boolean;
 }
 
+export interface SettingsEnableFirewallReq {
+  type: 'settings.enableFirewall';
+  enableFirewall: boolean;
+}
+
 export type Req =
   | CreateIdentityReq
   | UseIdentityReq
@@ -635,7 +641,8 @@ export type Req =
   | SettingsBlobsPurgeReq
   | SettingsShowFollowsReq
   | SettingsDetailedLogsReq
-  | SettingsAllowCheckingNewVersionReq;
+  | SettingsAllowCheckingNewVersionReq
+  | SettingsEnableFirewallReq;
 
 export function contentToPublishReq(content: NonNullable<Content>): PublishReq {
   return {type: 'publish', content};
@@ -943,6 +950,16 @@ async function consumeSink(
       if (req.type === 'settings.allowCheckingNewVersion') {
         ssb.settingsUtils.updateAllowCheckingNewVersion(
           req.allowCheckingNewVersion,
+          (err: any) => {
+            if (err) return console.error(err.message || err);
+          },
+        );
+        return;
+      }
+
+      if (req.type === 'settings.enableFirewall') {
+        ssb.settingsUtils.updateEnableFirewall(
+          req.enableFirewall,
           (err: any) => {
             if (err) return console.error(err.message || err);
           },
