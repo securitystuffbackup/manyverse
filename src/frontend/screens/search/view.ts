@@ -188,7 +188,7 @@ const SearchResults: React.FC<State> = (state) => {
   }
 
   switch (searchResults.type) {
-    case 'feed':
+    case 'HashtagResults':
       return h(Feed, {
         sel: 'feed',
         getReadable: searchResults.getReadable,
@@ -210,7 +210,7 @@ const SearchResults: React.FC<State> = (state) => {
             : (null as any),
       });
 
-    case 'posts':
+    case 'TextResults':
       return h(Results, {
         sel: 'results',
         query: state.query,

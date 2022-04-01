@@ -13,11 +13,11 @@ import {Props} from './props';
 
 type SearchResults =
   | {
-      type: 'feed';
+      type: 'HashtagResults';
       getReadable: GetReadable<ThreadSummaryWithExtras>;
     }
   | {
-      type: 'posts';
+      type: 'TextResults';
       getReadable: GetReadable<MsgAndExtras<PostContent>>;
     };
 
@@ -130,7 +130,10 @@ export default function model(
         function updateResultsReducer(prev: State): State {
           return {
             ...prev,
-            searchResults: {type: 'posts', getReadable: getResultsReadable},
+            searchResults: {
+              type: 'TextResults',
+              getReadable: getResultsReadable,
+            },
           };
         },
     );
@@ -144,7 +147,10 @@ export default function model(
         function updateResultsReducer(prev: State): State {
           return {
             ...prev,
-            searchResults: {type: 'feed', getReadable: getFeedReadable},
+            searchResults: {
+              type: 'HashtagResults',
+              getReadable: getFeedReadable,
+            },
           };
         },
     );
