@@ -114,8 +114,7 @@ export default function model(
         queryOverride: '',
         queryOverrideFlag: 1 - prev.queryOverrideFlag,
         queryInProgress: false,
-        getResultsReadable: null,
-        getFeedReadable: null,
+        searchResults: null,
       };
     },
   );
